@@ -2,8 +2,8 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const ServerEmitter = new EventEmitter();
 
-ServerEmitter.on("enter-home", () => {
-    fs.appendFile("log.txt", `${new Date().toLocaleString()} - Welcome to the home page \n`, (err) => {
+ServerEmitter.on("enter-page", (page) => {
+    fs.appendFile("log.txt", `${new Date().toLocaleString()} - Welcome to the ${page} page \n`, (err) => {
         if(err) console.log(err);
     })
 })
@@ -11,20 +11,23 @@ ServerEmitter.on("enter-home", () => {
 function server(http){
     return http.createServer((req, res) => {
         if(req.url === '/') {
-            ServerEmitter.emit('enter-home');
+            ServerEmitter.emit('enter-page', 'home');
             res.write('Welcome to the home page');
             res.end();
             return;
         } else if(req.url === '/about') {
+            ServerEmitter.emit('enter-page', 'about');
             res.write('Welcome to the about page');
             res.end();
             return;
         } 
         else if(req.url.search("/contact") != -1){
             if (req.url.split("/")[2] != undefined){
+                ServerEmitter.emit('enter-page', 'contact/'+req.url.split("/")[2]);
                 res.end(req.url.split("/")[2])
                 return;
             }
+            ServerEmitter.emit('enter-page', 'contact');
             res.write('Welcome to the contact page');
             res.end();
             return;
