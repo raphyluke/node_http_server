@@ -10,19 +10,20 @@ ServerEmitter.on("enter-page", (page) => {
 
 function server(http){
     return http.createServer((req, res) => {
-        if(req.url === '/') {
+        var serverURL = req.url.split("/");
+        if(serverURL[1] == "home") {
             ServerEmitter.emit('enter-page', 'home');
             res.write('Welcome to the home page');
             res.end();
             return;
-        } else if(req.url === '/about') {
+        } else if(serverURL[1] == "about") {
             ServerEmitter.emit('enter-page', 'about');
             res.write('Welcome to the about page');
             res.end();
             return;
         } 
-        else if(req.url.search("/contact") != -1){
-            if (req.url.split("/")[2] != undefined){
+        else if(serverURL[1] == "contact"){
+            if (serverURL[2] != undefined){
                 ServerEmitter.emit('enter-page', 'contact/'+req.url.split("/")[2]);
                 res.end(req.url.split("/")[2])
                 return;
