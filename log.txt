@@ -27,3 +27,6 @@
 30/12/2022, 02:24:54 - Welcome to the contact/coucou page 
 30/12/2022, 02:24:58 - Welcome to the log page 
 30/12/2022, 23:16:06 - Welcome to the home page 
+30/12/2022, 23:49:48 - Welcome to the home page 
+30/12/2022, 23:50:03 - Welcome to the contact page 
+30/12/2022, 23:50:09 - Welcome to the contact/yes page 
