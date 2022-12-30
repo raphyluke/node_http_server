@@ -11,7 +11,6 @@ ServerEmitter.on("enter-page", (page) => {
 
 function server(){
     return http.createServer((req, res) => {
-        res.on
         var serverURL = req.url.split("/");
         // check if log.txt exists if not create it
         if(!fs.existsSync('log.txt')) {
@@ -54,6 +53,26 @@ function server(){
                 res.write(data);
                 res.end();
             })
+        }
+        else if (serverURL[1] == "request"){
+            if (req.method == "POST"){
+                const chunks = [];
+                req.on("data", (chunk) => {
+                    chunks.push(chunk);
+                });
+                req.on("end", () => {
+                    console.log("all parts/chunks have arrived");
+                    const data = Buffer.concat(chunks);
+                    console.log("Data: ", data.toString());
+                    res.write(data.toString());
+                    res.end()
+                });
+            }
+            else {
+                res.write('404 Page not found');
+                res.end();
+                return;
+            }
         }
         else {
             res.write('404 Page not found');
