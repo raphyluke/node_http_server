@@ -11,7 +11,9 @@ if(cluster.isMaster) {
         cluster.fork();
     }
 } else {
-    server(http);
+    if(cluster.worker.id == 3) {
+        server();
+    }
 }
 // creating an event listener for the cluster
 cluster.on('exit', (worker, code, signal) => {

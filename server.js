@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const fs = require('fs');
 const ServerEmitter = new EventEmitter();
+const http = require('http');
 
 ServerEmitter.on("enter-page", (page) => {
     fs.appendFile("log.txt", `${new Date().toLocaleString()} - Welcome to the ${page} page \n`, (err) => {
@@ -8,8 +9,9 @@ ServerEmitter.on("enter-page", (page) => {
     })
 })
 
-function server(http){
+function server(){
     return http.createServer((req, res) => {
+        res.on
         var serverURL = req.url.split("/");
         // check if log.txt exists if not create it
         if(!fs.existsSync('log.txt')) {
@@ -17,8 +19,8 @@ function server(http){
                 if(err) console.log(err);
             })
         }
-        if(serverURL[1] == "home") {
-            ServerEmitter.emit('enter-page', 'home');
+        if(serverURL[1] == "") {
+            ServerEmitter.emit('enter-page', 'home');   
             res.write('Welcome to the home page');
             res.end();
             return;
@@ -38,6 +40,20 @@ function server(http){
             res.write('Welcome to the contact page');
             res.end();
             return;
+        }
+        else if (serverURL[1] == "log"){
+            // GET request only
+            if(req.method != "GET") {
+                res.write('404 Page not found');
+                res.end();
+                return;
+            }
+            return fs.readFile('log.txt', (err, data) => {
+                if(err) console.log(err);
+                ServerEmitter.emit('enter-page', 'log');
+                res.write(data);
+                res.end();
+            })
         }
         else {
             res.write('404 Page not found');
