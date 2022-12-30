@@ -7,3 +7,5 @@
 30/12/2022, 00:39:00 - Welcome to the contact/Raphael page 
 30/12/2022, 00:39:17 - Welcome to the home page 
 30/12/2022, 00:40:00 - Welcome to the home page 
+30/12/2022, 01:41:44 - Welcome to the contact page 
+30/12/2022, 01:41:47 - Welcome to the contact/coucou page 

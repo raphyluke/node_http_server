@@ -11,6 +11,12 @@ ServerEmitter.on("enter-page", (page) => {
 function server(http){
     return http.createServer((req, res) => {
         var serverURL = req.url.split("/");
+        // check if log.txt exists if not create it
+        if(!fs.existsSync('log.txt')) {
+            fs.writeFile('log.txt', '', (err) => {
+                if(err) console.log(err);
+            })
+        }
         if(serverURL[1] == "home") {
             ServerEmitter.emit('enter-page', 'home');
             res.write('Welcome to the home page');

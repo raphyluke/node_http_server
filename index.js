@@ -11,7 +11,6 @@ if(cluster.isMaster) {
         cluster.fork();
     }
 } else {
-    // run the server on the 3rd worker
     server(http);
 }
 // creating an event listener for the cluster
