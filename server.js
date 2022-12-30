@@ -60,8 +60,8 @@ function server(){
             res.end();
             return;
         }
-    }).listen(3000, () => {
-        console.log('Server is running on port 3000');
+    }).listen(8080, () => {
+        console.log('Server is running on port 8080');
     });
 }
 
