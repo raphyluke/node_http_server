@@ -1,6 +1,6 @@
 const http = require('http');
 const cluster = require('cluster');
-const server = require('./server');
+const Server = require('./server');
 const process = require('process');
 const fs = require('fs');
 
@@ -12,7 +12,13 @@ if(cluster.isMaster) {
     }
 } else {
     if(cluster.worker.id == 3) {
-        server();
+        const server = new Server(3000);
+        server.get("/", (req, res) => {
+            console.log("Handling the root route");
+            res.write("Welcome to the home page");
+            res.end();
+        });
+
     }
 }
 // creating an event listener for the cluster

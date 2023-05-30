@@ -1,87 +1,72 @@
 const EventEmitter = require('events');
 const fs = require('fs');
-const ServerEmitter = new EventEmitter();
 const http = require('http');
 
-ServerEmitter.on("enter-page", (page) => {
-    fs.appendFile("log.txt", `${new Date().toLocaleString()} - Welcome to the ${page} page \n`, (err) => {
-        if(err) console.log(err);
-    })
-})
+const ServerEmitter = new EventEmitter();
 
-function server(){
-    return http.createServer((req, res) => {
-        var serverURL = req.url.split("/");
-        // check if log.txt exists if not create it
-        if(!fs.existsSync('log.txt')) {
-            fs.writeFile('log.txt', '', (err) => {
-                if(err) console.log(err);
-            })
-        }
-        if(serverURL[1] == "") {
-            ServerEmitter.emit('enter-page', 'home');   
-            res.write('Welcome to the home page');
-            res.end();
-            return;
-        } else if(serverURL[1] == "about") {
-            ServerEmitter.emit('enter-page', 'about');
-            res.write('Welcome to the about page');
-            res.end();
-            return;
-        } 
-        else if(serverURL[1] == "contact"){
-            if (serverURL[2] != undefined){
-                ServerEmitter.emit('enter-page', 'contact/'+req.url.split("/")[2]);
-                res.end(req.url.split("/")[2])
-                return;
-            }
-            ServerEmitter.emit('enter-page', 'contact');
-            res.write('Welcome to the contact page');
-            res.end();
-            return;
-        }
-        else if (serverURL[1] == "log"){
-            // GET request only
-            if(req.method != "GET") {
-                res.write('404 Page not found');
-                res.end();
-                return;
-            }
-            return fs.readFile('log.txt', (err, data) => {
-                if(err) console.log(err);
-                ServerEmitter.emit('enter-page', 'log');
-                res.write(data);
-                res.end();
-            })
-        }
-        else if (serverURL[1] == "request"){
-            if (req.method == "POST"){
-                const chunks = [];
-                req.on("data", (chunk) => {
-                    chunks.push(chunk);
-                });
-                req.on("end", () => {
-                    console.log("all parts/chunks have arrived");
-                    const data = Buffer.concat(chunks);
-                    console.log("Data: ", data.toString());
-                    res.write(data.toString());
-                    res.end()
-                });
-            }
-            else {
-                res.write('404 Page not found');
-                res.end();
-                return;
-            }
-        }
-        else {
-            res.write('404 Page not found');
-            res.end();
-            return;
-        }
-    }).listen(8080, () => {
-        console.log('Server is running on port 8080');
+ServerEmitter.on('enter-page', (page) => {
+  fs.appendFile('log.txt', `${new Date().toLocaleString()} - Welcome to the ${page} page \n`, (err) => {
+    if (err) console.log(err);
+  });
+});
+
+class Server {
+  constructor(port) {
+    this.routes = [];
+    this.server = http.createServer((req, res) => {
+      const serverURL = req.url.split('/');
+
+      // Find the matching route and execute the callback
+      const route = this.routes.find((route) => {
+        const [method, url] = route.url.split(' ');
+        const joinedURL = serverURL.join('/');
+        return joinedURL === req.url;
+      });
+
+      if (route) {
+        const { callback } = route;
+        callback(req, res); // Invoke the callback with req and res objects
+      } else {
+        res.statusCode = 404;
+        res.end('Page not found');
+        console.log(this.routes);
+        console.log(req.url)
+      }
     });
+
+    this.server.once('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Port ${port} is already in use.`);
+      } else {
+        console.error('An error occurred:', err);
+      }
+      process.exit(1); // Terminate the process
+    });
+
+    // Start the server on the specified port
+    this.server.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+
+    // Emit event for logging
+    ServerEmitter.emit('enter-page', '/');
+  }
+
+  get(url, callback) {
+    this.routes.push({ url: `${url}`, callback: callback });
+  }
+
+  post(url, callback) {
+    this.routes.push({ url: `${url}`, callback: callback });
+  }
+
+  put(url, callback) {
+    this.routes.push({ url: `${url}`, callback: callback });
+  }
+
+  delete(url, callback) {
+    this.routes.push({ url: `${url}`, callback: callback });
+  }
 }
 
-module.exports = server;
+module.exports = Server;
