@@ -14,18 +14,14 @@ class Server {
   constructor(port) {
     this.routes = [];
     this.server = http.createServer((req, res) => {
-      const serverURL = req.url.split('/');
 
       // Find the matching route and execute the callback
       const route = this.routes.find((route) => {
-        const [method, url] = route.url.split(' ');
-        const joinedURL = serverURL.join('/');
-        return joinedURL === req.url;
+        return route.url === req.url;
       });
 
       if (route) {
-        const { callback } = route;
-        callback(req, res); // Invoke the callback with req and res objects
+        route.callback(req, res); // Invoke the callback with req and res objects
       } else {
         res.statusCode = 404;
         res.end('Page not found');

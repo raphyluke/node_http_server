@@ -13,12 +13,18 @@ if(cluster.isMaster) {
 } else {
     if(cluster.worker.id == 3) {
         const server = new Server(3000);
+
         server.get("/", (req, res) => {
             console.log("Handling the root route");
             res.write("Welcome to the home page");
             res.end();
         });
 
+        server.get("/about", (req, res) => {
+            console.log("Handling the about route");
+            res.write("Welcome to the about page");
+            res.end();
+        })
     }
 }
 // creating an event listener for the cluster
